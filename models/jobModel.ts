@@ -1,57 +1,64 @@
-import mongoose, { Schema, Document } from 'mongoose';
+// Importing mongoose library along with Document and Model types from it
+import mongoose, { Document, Model } from "mongoose";
 
-// Define the schema for the Job model
-interface IJob extends Document {
-  title: string;
-  company: string;
-  description?: string;
-  location?: string;
-  applicationStatus: 'applied' | 'interviewing' | 'rejected' | 'offer';
-  dateApplied: Date;
-  user: mongoose.Schema.Types.ObjectId; // Reference to the user who applied
+// Defining the structure of a job item using TypeScript interfaces
+export interface IJob {
+  job: string;
+  jobCompany: string;
+  jobLocation: string;
+  jobType: 'internship' | 'full-time';
+  jobApplicationStatus: 'applied' | 'screening' | 'interview' | 'offer' | 'rejected';
+  jobDescription?: string; 
 }
 
-// Define the schema structure
-const jobSchema: Schema<IJob> = new Schema(
+// Merging IJob interface with mongoose's Document interface to create 
+// a new interface that represents a job document in MongoDB
+export interface IJobDocument extends IJob, Document {
+  _id: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Defining a mongoose schema for the job document, specifying the types 
+// and constraints
+const JobSchema = new mongoose.Schema<IJobDocument>(
   {
-    title: {
+    job: {
       type: String,
       required: true,
     },
-    company: {
+    jobCompany: {
       type: String,
       required: true,
     },
-    description: {
+    jobLocation: {
       type: String,
       required: false,
     },
-    location: {
+    jobType: {
+      type: String,
+      enum: ['internship', 'full-time'],
+      required: true,
+    },
+    jobApplicationStatus: {
+      type: String,
+      enum: ['applied', 'screening', 'interview', 'offer', 'rejected'],
+      default: 'applied',
+      required: true,
+    },
+    jobDescription: {
       type: String,
       required: false,
-    },
-    applicationStatus: {
-      type: String,
-      enum: ['applied', 'interviewing', 'offer', 'rejected', 'hired'],
-      default: 'applied', // default to 'applied'
-      required: true,
-    },
-    dateApplied: {
-      type: Date,
-      default: Date.now, // set the default to current time
-    },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // Reference to the User model
-      required: true,
-    },
+    }
   },
   {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    // Automatically add 'createdAt' and 'updatedAt' fields to the document
+    timestamps: true,
   }
 );
 
-// Create and export the Job model
-const Job = mongoose.model<IJob>('Job', jobSchema);
+// Creating a mongoose model for the job document
+const Job: Model<IJobDocument> =
+  mongoose.models?.Job || mongoose.model("Job", JobSchema);
 
 export default Job;
