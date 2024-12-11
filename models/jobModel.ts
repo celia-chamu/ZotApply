@@ -57,6 +57,11 @@ const JobSchema = new mongoose.Schema<IJobDocument>(
   }
 );
 
+JobSchema.methods.getFormattedCreatedAt = function () {
+  const date = new Date(this.createdAt);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+};
+
 // Creating a mongoose model for the job document
 const Job: Model<IJobDocument> =
   mongoose.models?.Job || mongoose.model("Job", JobSchema);

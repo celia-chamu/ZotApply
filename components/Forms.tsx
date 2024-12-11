@@ -14,7 +14,7 @@ export default function Forms() {
         ref.current?.reset();
         await createJobs(FormData);
       }}
-      className="flex flex-col"
+      className="flex"
     >
       <h2 className="text-center text-green-400 font-bold">Add Job</h2>
       <label htmlFor="job" className="py-2">
